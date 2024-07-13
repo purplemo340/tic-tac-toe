@@ -1,51 +1,16 @@
 #imports
 
 from tkinter import *
-window=Tk()
-window.title('Tic Tac Toe')
-#TODO: Create visual display for users
+import math
+global player
+global game_arr
 
+player = 0
 def board():
     arr = [[str(x*3), str((x*3)+1), str((x*3)+2)] for x in range(0,3)]
-    print(arr)
-    for x in range (3):
-        print(f"\t|\t|\t")
-        if x!=2:
-            print("-------------")
-    return arr
-def game(arr):
-    for x in range (3):
-        print(f"\t{arr[x][0]}|\t{arr[x][1]}|\t{arr[x][2]}")
-        if x!=2:
-            print("-------------")
-    #return arr
-def player_1(player1, player2):
-    dec = input(f"{player1}: Choose the number space that you would like to mark")
-    dec = int(dec)
-    row = dec / 3
-    col = dec % 3
-    if arr[int(row)][int(col)] != f'{player2}':
-        arr[int(row)][int(col)] = f'{player1}'
-    else:
-        print("Wrong move")
-    game(arr)
+
     return arr
 
-
-def player_2(player2, player1):
-    dec = input(f"{player2}: Choose the number space that you would like to mark")
-    dec = int(dec)
-    row = dec / 3
-    col = dec % 3
-    if arr[int(row)][int(col)] != f'{player1}':
-        arr[int(row)][int(col)] = f'{player2}'
-    else:
-        print("Wrong move")
-    game(arr)
-    return arr
-
-
-# TODO: Keep track of a win
 def win(arr, player):
     sold = 0
     for x in range(3):
@@ -69,7 +34,7 @@ def win(arr, player):
                     print('hi')
             if arr[x][y] == player and x == y :
                 sold+=1
-                print('y')
+
             if sold==3:
                 return True
 
@@ -84,27 +49,43 @@ def win(arr, player):
         #         return True
     return False
 
+def switch(x):
+    global player
+    global game_arr
+    print(x)
+    arr=['x', 'o']
+   # arr1=[top_left, top_middle, top_right]
+    if player==0:
 
-arr=board()
-# TODO: Take users input
-player1=input("Player 1 ( x or o): ")
-player2=input("Player 2 ( x or o): ")
+        game_arr[int(x/3)][x%3] = f'{arr[player]}'
 
-# TODO: Alternate between each player
-y=0
-while(y<=9):
-    arr=player_1(player1, player2)
+        buttons[x].config(text=f"{arr[player]}")
+        winner = win(game_arr, arr[player])
+        if winner==True:
+            end(player)
+        player=1
+    else:
 
-    winner1=win(arr, player1)
-    print(winner1)
-    if winner1==True:
-        print(f"Congratulations {player1}!")
-        break
-    arr= player_2(player2, player1)
+        buttons[x].config(text=f"{arr[player]}")
+        winner=win(game_arr, arr[player])
+        if winner==True:
+            end(player)
+        player=0
+def end(winner):
+    for buttton in buttons:
+        buttton.destroy()
 
-    winner2 = win(arr, player2)
-    if winner2==True:
-        print(f"Congratulations {player2}!")
-        break
-    y+=2
+    congrats=Label(text= f"Congrats player:{winner}")
+    congrats.grid(column=0,row=0)
+game_arr=board()
 
+window=Tk()
+window.title('Tic Tac Toe')
+window.config(padx=50, pady=50, height=200, width=200)
+buttons=[]
+for x in range(9):
+    button=Button(height=0, width=5, font=24, command= lambda place=x:switch(place))
+    buttons.append(button)
+    buttons[x].grid(column=int(x/3), row=x%3)
+
+window.mainloop()
