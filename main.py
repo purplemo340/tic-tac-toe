@@ -4,88 +4,90 @@ from tkinter import *
 import math
 global player
 global game_arr
+global arr
+global buttons
 
+window=Tk()
+window.title('Tic Tac Toe')
+window.config(padx=50, pady=50, height=200, width=200)
+
+arr=['X', 'O']
+score_dict={'X':0, 'O':0}
 player = 0
+def game():
+    global game_arr
+    buttons_arr=[]
+    game_arr = board()
+    for x in range(9):
+        button=Button(height=0, width=5, font=24, command= lambda place=x:switch(place))
+        buttons_arr.append(button)
+        buttons_arr[x].grid(column=int(x/3), row=x%3)
+    return buttons_arr
 def board():
-    arr = [[str(x*3), str((x*3)+1), str((x*3)+2)] for x in range(0,3)]
+    array = [[str(x*3), str((x*3)+1), str((x*3)+2)] for x in range(0,3)]
 
-    return arr
+    return array
 
-def win(arr, player):
-    sold = 0
+def win(arr):
     for x in range(3):
-        soly=0
-        solx = 0
-
-        for y in range(3):
-            if arr[x][y]==player:
-                soly+=1
-                if soly==3:
-                    return True
-                if x==0 and y==2:
-                    sold+=1
-                    print(sold)
-            if arr[y][x]==player:
-                solx+=1
-                if solx==3:
-                    return True
-                if y==0 and x==2:
-                    sold+=1
-                    print('hi')
-            if arr[x][y] == player and x == y :
-                sold+=1
-
-            if sold==3:
-                return True
-
-                break
-
-        # soly = 0
-        # for y in x:
-        #     if y==f"{player}":
-        #         soly+=1
-        #         print(y.isdigit())
-        #     if soly==3:
-        #         return True
+        if all(y == arr[x][0] for y in arr[x]):
+            return True
+        if all(arr[y][x] == arr[0][x] for y in range(3)):
+            return True
+    if all(arr[y][y] == arr[0][0] for y in range(3)):
+        return True
+    if all(arr[y][(2-y)] == arr[0][2] for y in range(3)):
+        return True
     return False
+
+
 
 def switch(x):
     global player
     global game_arr
-    print(x)
-    arr=['x', 'o']
+
+
    # arr1=[top_left, top_middle, top_right]
     if player==0:
 
         game_arr[int(x/3)][x%3] = f'{arr[player]}'
 
         buttons[x].config(text=f"{arr[player]}")
-        winner = win(game_arr, arr[player])
+        winner = win(game_arr)
         if winner==True:
+            score_dict['X'] += 1
             end(player)
+
         player=1
     else:
+        game_arr[int(x / 3)][x % 3] = f'{arr[player]}'
 
         buttons[x].config(text=f"{arr[player]}")
-        winner=win(game_arr, arr[player])
+        winner=win(game_arr)
         if winner==True:
+            score_dict['O'] += 1
             end(player)
         player=0
 def end(winner):
-    for buttton in buttons:
-        buttton.destroy()
+    score.config(text=f"X: {score_dict['X']}\t O: {score_dict['O']}")
 
-    congrats=Label(text= f"Congrats player:{winner}")
+    for button in buttons:
+        button.destroy()
+
+    congrats.config(text=f"Congrats!: {arr[winner]}")
     congrats.grid(column=0,row=0)
-game_arr=board()
 
-window=Tk()
-window.title('Tic Tac Toe')
-window.config(padx=50, pady=50, height=200, width=200)
-buttons=[]
-for x in range(9):
-    button=Button(height=0, width=5, font=24, command= lambda place=x:switch(place))
-    buttons.append(button)
-    buttons[x].grid(column=int(x/3), row=x%3)
+    con.grid(column=0, row=1)
+def next_game():
+    global buttons
+    con.destroy()
+    congrats.destroy()
+    buttons=game()
 
+score = Label(text=f"X: {score_dict['X']}\t O: {score_dict['O']}")
+score.grid(row=3, column=0, columnspan=3)
+
+buttons=game()
+con=Button(text="Continue", command=next_game)
+congrats=Label()
 window.mainloop()
